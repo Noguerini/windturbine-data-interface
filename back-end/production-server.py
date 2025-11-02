@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
@@ -7,10 +10,11 @@ import uuid
 import numpy as np
 import ginsapy.giutility.connect.PyQStationConnectWin as Qstation
 import ginsapy.giutility.buffer.GInsDataGetBuffer as QStream
+import eventlet.wsgi
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 def start_buffer_stream():
     parser = argparse.ArgumentParser(description="Read values of running buffer and emit them via websocket")
@@ -28,7 +32,6 @@ def start_buffer_stream():
         except ValueError:
             return False
 
-    # Initialize buffer connection
     conn_get_stream = QStream.GetProcessBufferServer()
 
     try:
@@ -67,7 +70,6 @@ def start_buffer_stream():
 
     buffer = conn.yield_buffer()
 
-    # Continuously read buffer and emit via websocket
     print("Starting buffer read loop; emitting to websocket event 'wind_turbine_buffer'")
     try:
         for readbuffer in buffer:
@@ -139,13 +141,13 @@ def handle_connect():
     if not _stream_started:
         socketio.start_background_task(start_buffer_stream)
         _stream_started = True
-    # Optionally send a welcome/status message
     socketio.emit('status', {'message': 'connected to wind turbine buffer'}, namespace='/')
 
 
 if __name__ == '__main__':
-    # Ensure background task starts even without a client connecting
     if not _stream_started:
         socketio.start_background_task(start_buffer_stream)
         _stream_started = True
-    socketio.run(app, host='127.0.0.1', port=15641)
+    
+    print("Starting eventlet WSGI server on http://0.0.0.0:15641")
+    eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 15641)), app)

@@ -62,10 +62,7 @@
             const dataContainer = document.getElementById('data-container');
 
             // Connect to the Socket.IO server
-            // The address is based on your Python script: http://127.0.0.1:15641
-            const socket = io('http://127.0.0.1:15641', {
-                transports: ['websocket'] // Prefer websocket transport
-            });
+            const socket = io('https://84.39.66.172', { transports: ['websocket'] });
 
             // Handle successful connection
             socket.on('connect', () => {

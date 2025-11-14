@@ -62,7 +62,7 @@
             const dataContainer = document.getElementById('data-container');
 
             // Connect to the Socket.IO server
-            const socket = io('https://84.39.66.172', { transports: ['websocket'] });
+            const socket = io('https://127.0.0.1:15641', { transports: ['websocket'] });
 
             // Handle successful connection
             socket.on('connect', () => {

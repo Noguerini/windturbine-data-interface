@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wind Turbine Buffer Viewer</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #eee;
+      margin: 0;
+      padding: 1em;
+    }
+    #status {
+      margin-bottom: 1em;
+      color: #0f0;
+    }
+    #data {
+      white-space: pre-wrap;
+      font-family: monospace;
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h2>Wind Turbine Buffer Stream</h2>
+  <div id="status">Connecting...</div>
+  <div id="data"></div>
+
+  <script>
+    // Connect to the Flask-SocketIO server
+    const socket = io("http://localhost:15641"); // adjust if needed
+
+    const statusEl = document.getElementById("status");
+    const dataEl = document.getElementById("data");
+
+    socket.on("connect", () => {
+      statusEl.textContent = "✅ Connected to server";
+    });
+
+    socket.on("disconnect", () => {
+      statusEl.textContent = "❌ Disconnected from server";
+    });
+
+    socket.on("status", (msg) => {
+      console.log("Server status:", msg);
+    });
+
+    socket.on("wind_turbine_buffer", (data) => {
+      // Display latest message at the top
+      const line = `Timestamp: ${data.timestamp.toFixed(3)} | Channels: ${JSON.stringify(data.channels)}`;
+      const div = document.createElement("div");
+      div.textContent = line;
+      dataEl.prepend(div);
+
+      // Keep only last 50 messages
+      while (dataEl.childElementCount > 50) {
+        dataEl.removeChild(dataEl.lastChild);
+      }
+    });
+  </script>
+</body>
+</html>

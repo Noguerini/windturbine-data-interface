@@ -1,0 +1,12 @@
+.panel {
+  width: 80%;
+  height: 98vh;
+  padding: 20px;
+  background-color: #181818;
+  border: 2px solid #ffffff; /* white border */
+  border-radius: 10px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  color: #ffffff;
+  scrollbar-width: none;             /* all text white */
+}

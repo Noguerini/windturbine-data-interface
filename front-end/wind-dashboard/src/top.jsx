@@ -11,7 +11,7 @@ function App() {
     const [channels, setChannels] = useState([]);
 
     useEffect(() => {
-        const socket = io("http://localhost:5173", {
+        const socket = io("http://localhost:15641", {
             transports: ["websocket"],
         });
 

@@ -142,6 +142,6 @@ def start_buffer_stream(cloud_url):
 
 
 if __name__ == "__main__":
-    CLOUD_WS_URL = "https://YOUR-CLOUD-SOCKETIO-SERVER"   # ← fill this in
+    CLOUD_WS_URL = "https://MYIP:3000"   # ← fill this in
     
     start_buffer_stream(CLOUD_WS_URL)

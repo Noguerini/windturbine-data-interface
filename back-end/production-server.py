@@ -75,11 +75,11 @@ def start_buffer_stream():
         for readbuffer in buffer:
             try:
                 parsed = parse_buffer(readbuffer)
-                if parsed is not None:
+                if parsed is not None and parsed["timestamp"] < 40000:
                     socketio.emit('wind_turbine_buffer', parsed, namespace='/')
             except Exception as e:
                 print("Emit error:", e)
-            socketio.sleep(0.01)
+            socketio.sleep(1)
     except KeyboardInterrupt:
         print("Terminated by user.")
     except Exception as e:
@@ -87,10 +87,6 @@ def start_buffer_stream():
 
 
 def parse_buffer(readbuffer):
-    """
-    Safely converts a Gantner readbuffer (list or ndarray) into a JSON-serializable dict.
-    Handles nested arrays and various shapes.
-    """
     if readbuffer is None:
         return None
 
@@ -126,6 +122,7 @@ def parse_buffer(readbuffer):
     else:
         channels = list(channels)
 
+    channels = channels[:43]
     return {
         "timestamp": float(timestamp_val),
         "channels": channels

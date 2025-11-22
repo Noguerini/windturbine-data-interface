@@ -9,7 +9,7 @@ import uuid
 import numpy as np
 import ginsapy.giutility.connect.PyQStationConnectWin as Qstation
 import ginsapy.giutility.buffer.GInsDataGetBuffer as QStream
-import time # Added for client sleep functionality
+import time
 
 # --- Configuration ---
 SERVER_URL = 'http://87.152.190.203:15064'
@@ -18,12 +18,15 @@ EMIT_EVENT = 'data'
 
 
 # Initialize the SocketIO Client
-sio = socketio.Client(logger=True, engineio_logger=True, reconnect=True, reconnection_attempts=5)
+# THIS IS THE FINAL FIX required for python-socketio 5.x and python-engineio 4.x
+sio = socketio.Client(
+    logger=True,
+    engineio_logger=True
+)
 
 def parse_buffer(readbuffer):
     """
     Parses the data buffer read from the GINS connection.
-    (This function remains largely the same as in the original code)
     """
     if readbuffer is None:
         return None
@@ -81,7 +84,7 @@ def start_buffer_stream():
                         help=f"WebSocket server URL (default: {SERVER_URL})")
 
     args = parser.parse_args()
-    SERVER_URL = args.server_url
+    current_server_url = args.server_url
 
     def is_uuid(value: str) -> bool:
         try:
@@ -135,8 +138,8 @@ def start_buffer_stream():
     # --- Client Connection and Data Loop ---
     try:
         # Connect to the server. This blocks until connected or failed.
-        print(f"Connecting to WebSocket server at {SERVER_URL}...")
-        sio.connect(SERVER_URL)
+        print(f"Connecting to WebSocket server at {current_server_url}...")
+        sio.connect(current_server_url)
         print("Client connected successfully.")
 
         print(f"Starting buffer read loop; emitting to server event '{EMIT_EVENT}'")
@@ -153,7 +156,7 @@ def start_buffer_stream():
             time.sleep(1) # Sleep for 1 second between reads
             
     except socketio.exceptions.ConnectionError as e:
-        print(f"Connection failed: {e}. Is the server running at {SERVER_URL}?")
+        print(f"Connection failed: {e}. Is the server running at {current_server_url}?")
     except KeyboardInterrupt:
         print("Terminated by user.")
     except Exception as e:

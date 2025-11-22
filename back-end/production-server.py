@@ -76,7 +76,7 @@ def start_buffer_stream():
             try:
                 parsed = parse_buffer(readbuffer)
                 if parsed is not None and parsed["timestamp"] < 40000:
-                    socketio.emit('wind_turbine_buffer', parsed, namespace='/')
+                    socketio.emit('data', parsed, namespace='/')
             except Exception as e:
                 print("Emit error:", e)
             socketio.sleep(1)
